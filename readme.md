@@ -4,6 +4,8 @@
 
 Simple webapi that returns the public ip of the connecting client
 
+![](./doc/dia.svg)
+
 ## quickstart
 
 ```sh
@@ -32,33 +34,33 @@ server {
     proxy_pass http://UTILSERVERIP:5001;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
   }
 
-  listen 443 ssl; # managed by Certbot
-  ssl_certificate /etc/letsencrypt/live/somedomain.com/fullchain.pem; # managed by Certbot
-  ssl_certificate_key /etc/letsencrypt/live/somedomain.com/privkey.pem; # managed by Certbot
-  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+  listen 443 ssl;
+  ssl_certificate /etc/letsencrypt/live/somedomain.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/somedomain.com/privkey.pem;
+  include /etc/letsencrypt/options-ssl-nginx.conf;
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 }
 
 server {
   if ($host = util.somedomain.com) {
     return 301 https://$host$request_uri;
-  } # managed by Certbot
+  }
 
   server_name util.somedomain.com;
   listen 80;
-  return 404; # managed by Certbot
+  return 404;
 }
 ```
 
 connect to `https://util.somedomain/ip` to get public ip of connecting client.
 
 ## deploy samples
+
+### server
+
+
 
 ### publish with script
 
@@ -108,7 +110,7 @@ where the `/root/security/public-ip.env` could contains
 ```sh
 DOTNET_ROOT=/opt/dotnet
 ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=http://SRV_LAN_IP:5001
+ASPNETCORE_URLS=http://UTILSERVERIP:5001
 ```
 
 ## how this project was built
