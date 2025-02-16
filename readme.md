@@ -44,7 +44,8 @@ server {
   error_log /var/log/nginx/util.error.log notice;  
 
   location /ip/ {
-    rewrite /ip/(.*) /$1 break;
+    rewrite /ip / break; # handle exact /ip request rewrite to /
+    rewrite /ip/(.*) /$1 break; # handle /ip/somearg requests rewrite to /someargs
     include /etc/nginx/mime.types;
     
     proxy_set_header Host $host;
