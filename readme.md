@@ -1,5 +1,13 @@
 # public ip
 
+- [description](#description)
+- [quickstart](#quickstart)
+- [deploy samples](#deploy-samples)
+  - [nginx](#nginx)
+  - [util server service](#util-server-service)
+  - [publish with script](#publish-with-script)
+- [how this project was built](#how-this-project-was-built)
+
 ## description
 
 Simple webapi that returns the public ip of the connecting client
@@ -12,9 +20,18 @@ Simple webapi that returns the public ip of the connecting client
 dotnet build -c Release
 ```
 
-- copy `src/bin/Release/net9.0/publish` folder to some `/srv/app/public-ip`
+- copy `src/bin/Release/net9.0/publish` folder to some `/srv/app/public-ip` ( see below [publish with script](#publish-with-script) )
 
-- setup a nginx conf `/etc/nginx/conf.d/util.somedomain.conf` to proxy this service replacing
+- setup a nginx ( see below [nginx](#nginx) )
+
+connect to `https://util.somedomain/ip` to get public ip of connecting client.
+
+## deploy samples
+
+### nginx
+
+Following an example of `/etc/nginx/conf.d/util.somedomain.conf` replacing
+
   - `somedomain` with the domain name ( to enable https cert [see here][2] )
   - `UTILSERVERIP` with the ip where this service run ( see [setup systemd][1] )
 
@@ -54,33 +71,7 @@ server {
 }
 ```
 
-connect to `https://util.somedomain/ip` to get public ip of connecting client.
-
-## deploy samples
-
-### server
-
-
-
-### publish with script
-
-following and example of a `publish.sh` script to publish the app to a server
-
-```sh
-#!/bin/bash
-
-exdir=$(dirname $(readlink -f "$BASH_SOURCE"))
-
-cd "$exdir"
-
-dotnet publish -c Release
-
-rsync -arvx --delete "$exdir"/src/bin/Release/net9.0/publish/ main-apps:/srv/app/public-ip/bin/
-
-ssh main-apps service public-ip restart
-```
-
-### service
+### util server service
 
 following and example for the [systemd service][1] `/etc/systemd/system/public-ip.service`
 
@@ -111,6 +102,23 @@ where the `/root/security/public-ip.env` could contains
 DOTNET_ROOT=/opt/dotnet
 ASPNETCORE_ENVIRONMENT=Production
 ASPNETCORE_URLS=http://UTILSERVERIP:5001
+```
+### publish with script
+
+following and example of a `publish.sh` script to publish the app to a server
+
+```sh
+#!/bin/bash
+
+exdir=$(dirname $(readlink -f "$BASH_SOURCE"))
+
+cd "$exdir"
+
+dotnet publish -c Release
+
+rsync -arvx --delete "$exdir"/src/bin/Release/net9.0/publish/ main-apps:/srv/app/public-ip/bin/
+
+ssh main-apps service public-ip restart
 ```
 
 ## how this project was built
